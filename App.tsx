@@ -145,7 +145,7 @@ export default function App() {
             {content.heroLogoUrl && (
               <img 
                 src={content.heroLogoUrl} 
-                alt="Logo" 
+                alt="ajen design logo" 
                 className="w-24 md:w-32 mb-6"
               />
             )}
@@ -256,7 +256,7 @@ export default function App() {
         <footer className="relative bg-[#222222] py-24 flex flex-col items-center justify-center">
            <button 
              onClick={scrollToTop}
-             className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-[#333333] p-3 hover:bg-[#ec2227] transition-colors text-white shadow-lg"
+             className="absolute -top-6 left-1/2 transform -translate-x-1/2 bg-[#222222] p-3 hover:bg-[#ec2227] transition-colors text-white"
              title="Scroll to Top"
            >
              <ChevronUp size={24} />
@@ -267,7 +267,7 @@ export default function App() {
                 <img 
                   src={content.logoUrl} 
                   alt="ajen design" 
-                  className="h-8 w-auto object-contain brightness-0 invert opacity-50 hover:opacity-100 transition-opacity"
+                  className="h-8 w-auto object-contain opacity-100 hover:opacity-50 transition-opacity"
                 />
               ) : (
                 <div className="w-8 h-8 bg-white flex items-center justify-center">

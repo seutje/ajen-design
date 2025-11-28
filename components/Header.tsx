@@ -70,14 +70,14 @@ export const Header: React.FC<HeaderProps> = ({
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 h-20 bg-[#222222]/90 backdrop-blur-sm z-40 flex items-center justify-between px-6 md:px-12 border-b border-transparent transition-all duration-300">
+    <header className="fixed top-0 left-0 right-0 h-20 bg-[#222222] backdrop-blur-sm z-40 flex items-center justify-between px-6 md:px-12 border-b border-transparent transition-all duration-300">
       <div className="flex items-center cursor-pointer" onClick={() => scrollToSection('hero')}>
         {/* Logo Mark */}
         {logoUrl ? (
            <img 
              src={logoUrl} 
              alt="ajen design" 
-             className="h-8 w-auto mr-3 object-contain"
+             className="h-19 w-auto mr-3 object-contain"
              onError={(e) => {
                // Fallback to text if image fails to load
                e.currentTarget.style.display = 'none';
@@ -89,7 +89,6 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="text-black font-bold text-xs">a</span>
           </div>
         )}
-        <span className="text-lg font-medium tracking-tight text-white">ajen design</span>
       </div>
 
       {/* Desktop Menu */}
