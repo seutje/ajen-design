@@ -6,6 +6,8 @@ import { AdminControl } from './components/AdminControl';
 import { ProjectDetail } from './components/ProjectDetail';
 import { ArrowUpRight, ChevronUp } from 'lucide-react';
 
+type ProjectAnimationState = 'idle' | 'entering' | 'exiting';
+
 export default function App() {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -13,6 +15,8 @@ export default function App() {
   const [selectedProjectId, setSelectedProjectId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [renderedProjects, setRenderedProjects] = useState<Project[]>([]);
+  const [projectStatuses, setProjectStatuses] = useState<Record<string, ProjectAnimationState>>({});
 
   useEffect(() => {
     const loadContent = async () => {
@@ -59,6 +63,61 @@ export default function App() {
     return content.projects.filter(p => p.category === activeCategory);
   }, [content, activeCategory]);
 
+  // Initialize rendered projects once content is loaded
+  useEffect(() => {
+    if (!content) return;
+    setRenderedProjects(content.projects);
+    const initialStatuses: Record<string, ProjectAnimationState> = {};
+    content.projects.forEach(project => {
+      initialStatuses[project.id] = 'idle';
+    });
+    setProjectStatuses(initialStatuses);
+  }, [content]);
+
+  // Handle project animations when filters change
+  useEffect(() => {
+    if (!content) return;
+
+    const visibleIds = new Set(filteredProjects.map(project => project.id));
+
+    setRenderedProjects(prevRendered => {
+      const orderedProjects = new Map<string, Project>();
+
+      filteredProjects.forEach(project => {
+        orderedProjects.set(project.id, project);
+      });
+
+      prevRendered.forEach(project => {
+        if (!visibleIds.has(project.id)) {
+          orderedProjects.set(project.id, project);
+        }
+      });
+
+      return Array.from(orderedProjects.values());
+    });
+
+    setProjectStatuses(prevStatuses => {
+      const nextStatuses: Record<string, ProjectAnimationState> = { ...prevStatuses };
+
+      Object.keys(prevStatuses).forEach(projectId => {
+        if (!visibleIds.has(projectId) && prevStatuses[projectId] !== 'exiting') {
+          nextStatuses[projectId] = 'exiting';
+        }
+      });
+
+      filteredProjects.forEach(project => {
+        const previousStatus = prevStatuses[project.id];
+        if (!previousStatus || previousStatus === 'exiting') {
+          nextStatuses[project.id] = 'entering';
+        } else {
+          nextStatuses[project.id] = 'idle';
+        }
+      });
+
+      return nextStatuses;
+    });
+  }, [content, filteredProjects]);
+
   const categories = useMemo(() => {
     if (!content) return ['all'];
     const cats = new Set(content.projects.map(p => p.category));
@@ -86,6 +145,21 @@ export default function App() {
 
   const handleCloseModal = () => {
     setSelectedProjectId(null);
+  };
+
+  const handleProjectAnimationEnd = (projectId: string, state: ProjectAnimationState) => {
+    if (state === 'exiting') {
+      setRenderedProjects(prev => prev.filter(project => project.id !== projectId));
+      setProjectStatuses(prev => {
+        const updated = { ...prev };
+        delete updated[projectId];
+        return updated;
+      });
+    }
+
+    if (state === 'entering') {
+      setProjectStatuses(prev => ({ ...prev, [projectId]: 'idle' }));
+    }
   };
   
   const scrollToTop = () => {
@@ -181,25 +255,36 @@ export default function App() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-1 md:gap-4">
-            {filteredProjects.map((project) => (
-              <div 
-                key={project.id}
-                onClick={() => setSelectedProjectId(project.id)}
-                className="group relative aspect-square cursor-pointer overflow-hidden bg-gray-100"
-              >
-                <img 
-                  src={project.thumbnail} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                  <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 text-center">
-                    <h3 className="text-white text-xl font-light lowercase mb-1">{project.title}</h3>
-                    <span className="text-gray-300 text-xs uppercase tracking-widest">{project.category}</span>
+            {renderedProjects.map((project) => {
+              const animationState = projectStatuses[project.id] ?? 'idle';
+              const animationClass =
+                animationState === 'entering'
+                  ? 'animate-portfolio-enter'
+                  : animationState === 'exiting'
+                    ? 'animate-portfolio-exit'
+                    : '';
+
+              return (
+                <div
+                  key={project.id}
+                  onClick={() => setSelectedProjectId(project.id)}
+                  className={`group relative aspect-square cursor-pointer overflow-hidden bg-gray-100 ${animationClass}`}
+                  onAnimationEnd={() => handleProjectAnimationEnd(project.id, animationState)}
+                >
+                  <img
+                    src={project.thumbnail}
+                    alt={project.title}
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0 text-center">
+                      <h3 className="text-white text-xl font-light lowercase mb-1">{project.title}</h3>
+                      <span className="text-gray-300 text-xs uppercase tracking-widest">{project.category}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </section>
 

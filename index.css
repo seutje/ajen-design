@@ -1,0 +1,29 @@
+@keyframes portfolio-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes portfolio-exit {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.animate-portfolio-enter {
+  animation: portfolio-enter 220ms ease-out forwards;
+}
+
+.animate-portfolio-exit {
+  animation: portfolio-exit 180ms ease-in forwards;
+}
