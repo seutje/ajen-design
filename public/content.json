@@ -1,6 +1,6 @@
 {
-  "logoUrl": "http://ajendesign.com/wp-content/uploads/2014/12/Ajen_design_logo-03.png",
-  "heroLogoUrl": "http://ajendesign.com/wp-content/uploads/2014/12/Ajen_design_logo-01.png",
+  "logoUrl": "./assets/logo-header.png",
+  "heroLogoUrl": "./assets/logo-hero.png",
   "heroImageUrl": "./assets/hero.jpg",
   "contactEmail": "hello@ajendesign.com",
   "projects": [
