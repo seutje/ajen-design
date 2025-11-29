@@ -63,7 +63,12 @@
       "year": "2024",
       "images": [
         "https://picsum.photos/id/180/1200/800",
-        "https://picsum.photos/id/190/1200/800"
+        "https://picsum.photos/id/190/1200/800",
+        {
+          "url": "https://www.youtube.com/watch?v=ysz5S6PUM-U",
+          "type": "youtube",
+          "alt": "Product walkthrough video"
+        }
       ]
     }
   ],

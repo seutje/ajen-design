@@ -6,11 +6,37 @@ interface ProjectDetailProps {
   project: Project;
 }
 
+type Slide = {
+  url: string;
+  alt?: string;
+  type: 'image' | 'youtube';
+};
+
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
+  const isYouTubeUrl = (url: string) => {
+    return /youtube\.com\/watch\?v=|youtu\.be\//i.test(url);
+  };
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    const match = url.match(/(?:v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+    if (!match) return null;
+    return `https://www.youtube.com/embed/${match[1]}`;
+  };
+
+  const toSlide = (img: ProjectImage): Slide => {
+    if (typeof img === 'string') {
+      const inferredType: Slide['type'] = isYouTubeUrl(img) ? 'youtube' : 'image';
+      return { url: img, type: inferredType };
+    }
+
+    const inferredType: Slide['type'] = img.type ? img.type : isYouTubeUrl(img.url) ? 'youtube' : 'image';
+    return { url: img.url, alt: img.alt, type: inferredType };
+  };
+
   // Combine gallery images. If no gallery images, use thumbnail as single slide.
-  const slides: ProjectImage[] = project.images.length > 0 ? project.images : [project.thumbnail];
+  const slides: Slide[] = (project.images.length > 0 ? project.images : [project.thumbnail]).map(toSlide);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -18,14 +44,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-  };
-
-  const getImageUrl = (img: ProjectImage): string => {
-    return typeof img === 'string' ? img : img.url;
-  };
-
-  const getImageAlt = (img: ProjectImage): string => {
-    return typeof img === 'string' ? '' : (img.alt || '');
   };
 
   return (
@@ -80,12 +98,29 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
         
         {/* Slides */}
         <div className="w-full h-full p-8 md:p-12 lg:p-16 flex items-center justify-center">
-            <img 
-              key={currentSlide}
-              src={getImageUrl(slides[currentSlide])}
-              alt={getImageAlt(slides[currentSlide]) || `Slide ${currentSlide + 1}`}
-              className="max-w-full max-h-full object-contain shadow-xl animate-in fade-in duration-300"
-            />
+            {slides[currentSlide].type === 'youtube' ? (
+              <div 
+                key={`video-${currentSlide}`}
+                className="w-full h-full flex items-center justify-center animate-in fade-in duration-300"
+              >
+                <div className="relative w-full h-full rounded shadow-xl overflow-hidden bg-black">
+                  <iframe
+                    src={getYouTubeEmbedUrl(slides[currentSlide].url) || slides[currentSlide].url}
+                    title={slides[currentSlide].alt || `YouTube video ${currentSlide + 1}`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            ) : (
+              <img 
+                key={`image-${currentSlide}`}
+                src={slides[currentSlide].url}
+                alt={slides[currentSlide].alt || `Slide ${currentSlide + 1}`}
+                className="max-w-full max-h-full object-contain shadow-xl animate-in fade-in duration-300"
+              />
+            )}
         </div>
 
         {/* Navigation Overlays */}

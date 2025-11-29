@@ -1,4 +1,4 @@
-export type ProjectImage = string | { url: string; alt?: string };
+export type ProjectImage = string | { url: string; alt?: string; type?: 'image' | 'youtube' };
 
 export interface Project {
   id: string;

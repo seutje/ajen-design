@@ -83,6 +83,8 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
     }
   };
 
+  const isYouTubeUrl = (url: string) => /youtube\.com\/watch\?v=|youtu\.be\//i.test(url);
+
   const moveProject = (index: number, direction: 'up' | 'down') => {
     if ((direction === 'up' && index === 0) || 
         (direction === 'down' && index === draftContent.projects.length - 1)) {
@@ -330,7 +332,8 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
                     </div>
                     
                     <div>
-                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-2">Gallery Images</label>
+                        <label className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Gallery Media</label>
+                        <p className="text-[11px] text-gray-500 mb-2">Add image URLs or paste a YouTube link to embed a video.</p>
                         <div className="space-y-3 bg-gray-100 p-4 rounded-md">
                             {project.images.length === 0 && (
                                 <p className="text-xs text-gray-400 italic text-center py-2">No images added yet.</p>
@@ -346,19 +349,24 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
                                                 value={url}
                                                 onChange={(e) => {
                                                     const newImages = [...project.images];
-                                                    const currentAlt = typeof newImages[idx] === 'string' ? '' : (newImages[idx] as any).alt;
-                                                    newImages[idx] = { url: e.target.value, alt: currentAlt };
+                                                    const current = newImages[idx];
+                                                    const currentAlt = typeof current === 'string' ? '' : (current as any).alt;
+                                                    const currentType = typeof current === 'string' ? undefined : (current as any).type;
+                                                    const type = isYouTubeUrl(e.target.value) ? 'youtube' : (currentType || 'image');
+                                                    newImages[idx] = { url: e.target.value, alt: currentAlt, type };
                                                     updateProject(project.id, 'images', newImages);
                                                 }}
-                                                placeholder="Image URL"
+                                                placeholder="Image or YouTube URL"
                                                 className="w-full p-2 border border-gray-300 rounded text-sm bg-gray-50 focus:bg-white transition-colors"
                                             />
                                             <input
                                                 value={alt || ''}
                                                 onChange={(e) => {
                                                      const newImages = [...project.images];
-                                                     const currentUrl = typeof newImages[idx] === 'string' ? newImages[idx] as string : (newImages[idx] as any).url;
-                                                     newImages[idx] = { url: currentUrl, alt: e.target.value };
+                                                     const current = newImages[idx];
+                                                     const currentUrl = typeof current === 'string' ? current as string : (current as any).url;
+                                                     const currentType = typeof current === 'string' ? undefined : (current as any).type;
+                                                     newImages[idx] = { url: currentUrl, alt: e.target.value, type: currentType || 'image' };
                                                      updateProject(project.id, 'images', newImages);
                                                 }}
                                                 placeholder="Alt Text (Optional)"
@@ -385,12 +393,12 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
                             <Button 
                                 variant="secondary" 
                                 onClick={() => {
-                                    const newImages = [...project.images, { url: '', alt: '' }];
+                                    const newImages = [...project.images, { url: '', alt: '', type: 'image' }];
                                     updateProject(project.id, 'images', newImages);
                                 }} 
                                 className="w-full flex justify-center items-center gap-2 py-2 text-xs border border-gray-300 bg-white hover:bg-gray-50"
                             >
-                                <Plus size={14} /> Add Image
+                                <Plus size={14} /> Add Media
                             </Button>
                         </div>
                     </div>
