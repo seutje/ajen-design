@@ -17,6 +17,15 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [renderedProjects, setRenderedProjects] = useState<Project[]>([]);
   const [projectStatuses, setProjectStatuses] = useState<Record<string, ProjectAnimationState>>({});
+  const defaultHeroImage = `${import.meta.env.BASE_URL}assets/hero.jpg`;
+
+  const resolveHeroImageUrl = (url?: string) => {
+    if (!url) return defaultHeroImage;
+    const isAbsolute = /^https?:\/\//.test(url) || url.startsWith('data:');
+    if (isAbsolute) return url;
+    const cleanedPath = url.replace(/^\//, '').replace(/^\.\//, '');
+    return `${import.meta.env.BASE_URL}${cleanedPath}`;
+  };
 
   useEffect(() => {
     const loadContent = async () => {
@@ -172,6 +181,8 @@ export default function App() {
     return [...content.exhibitions].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [content]);
 
+  const heroImageSrc = resolveHeroImageUrl(content?.heroImageUrl);
+
   if (isLoading) {
     return (
       <div className="h-screen w-full flex items-center justify-center bg-white">
@@ -203,12 +214,12 @@ export default function App() {
 
       {/* Main Content Layer - Hidden when modal is open on small screens, or blurred/pushed back */}
       <main className={`transition-opacity duration-500 ${selectedProjectId ? 'opacity-0 lg:opacity-100' : 'opacity-100'}`}>
-        
+          
         {/* Hero Section */}
         <section id="hero" className="relative h-screen w-full flex items-center justify-center overflow-hidden">
           <div className="absolute inset-0 z-0">
              <img 
-               src="https://picsum.photos/1920/1080?grayscale" 
+               src={heroImageSrc}
                alt="Hero Background" 
                className="w-full h-full object-cover opacity-80"
              />

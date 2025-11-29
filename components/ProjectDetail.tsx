@@ -9,7 +9,7 @@ interface ProjectDetailProps {
 type Slide = {
   url: string;
   alt?: string;
-  type: 'image' | 'youtube';
+  type: 'image' | 'youtube' | 'pdf';
 };
 
 export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
@@ -17,6 +17,10 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
 
   const isYouTubeUrl = (url: string) => {
     return /youtube\.com\/watch\?v=|youtu\.be\//i.test(url);
+  };
+
+  const isPdfUrl = (url: string) => {
+    return /\.pdf($|\?)/i.test(url);
   };
 
   const getYouTubeEmbedUrl = (url: string) => {
@@ -27,11 +31,17 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
 
   const toSlide = (img: ProjectImage): Slide => {
     if (typeof img === 'string') {
-      const inferredType: Slide['type'] = isYouTubeUrl(img) ? 'youtube' : 'image';
+      const inferredType: Slide['type'] = isYouTubeUrl(img) ? 'youtube' : isPdfUrl(img) ? 'pdf' : 'image';
       return { url: img, type: inferredType };
     }
 
-    const inferredType: Slide['type'] = img.type ? img.type : isYouTubeUrl(img.url) ? 'youtube' : 'image';
+    const inferredType: Slide['type'] = img.type
+      ? img.type
+      : isYouTubeUrl(img.url)
+        ? 'youtube'
+        : isPdfUrl(img.url)
+          ? 'pdf'
+          : 'image';
     return { url: img.url, alt: img.alt, type: inferredType };
   };
 
@@ -124,14 +134,6 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
             )}
           </div>
 
-          {/* Thumbnail Image (Placed at bottom left as per request) */}
-          <div className="mt-auto">
-             <img 
-               src={project.thumbnail} 
-               alt="Project Thumbnail" 
-               className="w-full h-auto rounded-sm shadow-sm grayscale hover:grayscale-0 transition-all duration-500"
-             />
-          </div>
         </div>
       </div>
 
@@ -158,6 +160,31 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                   />
+                </div>
+              </div>
+            ) : slides[currentSlide].type === 'pdf' ? (
+              <div
+                key={`pdf-${currentSlide}`}
+                className="w-full h-full flex items-center justify-center animate-in fade-in duration-300"
+              >
+                <div className="relative w-full h-full rounded shadow-xl overflow-hidden bg-white">
+                  <object
+                    data={slides[currentSlide].url}
+                    type="application/pdf"
+                    className="w-full h-full"
+                  >
+                    <div className="w-full h-full flex flex-col items-center justify-center gap-3 p-6 bg-gray-50 text-sm text-gray-700">
+                      <p>PDF preview unavailable.</p>
+                      <a
+                        href={slides[currentSlide].url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-[#ec2227] underline hover:no-underline"
+                      >
+                        Open PDF in new tab
+                      </a>
+                    </div>
+                  </object>
                 </div>
               </div>
             ) : (

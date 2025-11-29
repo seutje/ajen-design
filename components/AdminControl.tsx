@@ -210,6 +210,18 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
                             />
                             <p className="text-[10px] text-gray-400 mt-1">Displayed prominently in the hero section.</p>
                         </div>
+
+                        <div>
+                            <label className="text-xs uppercase font-bold text-gray-400 block mb-2">Hero Image URL</label>
+                            <input 
+                                type="text" 
+                                value={draftContent.heroImageUrl || ''} 
+                                onChange={(e) => setDraftContent({...draftContent, heroImageUrl: e.target.value})}
+                                placeholder="assets/hero.jpg or https://..."
+                                className="w-full p-3 border border-gray-300 rounded bg-white"
+                            />
+                            <p className="text-[10px] text-gray-400 mt-1">Background image for the hero. Defaults to the bundled assets/hero.jpg.</p>
+                        </div>
                         
                         <div>
                             <label className="text-xs uppercase font-bold text-gray-400 block mb-2">Contact Email</label>

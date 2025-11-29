@@ -1,4 +1,4 @@
-export type ProjectImage = string | { url: string; alt?: string; type?: 'image' | 'youtube' };
+export type ProjectImage = string | { url: string; alt?: string; type?: 'image' | 'youtube' | 'pdf' };
 
 export interface Project {
   id: string;
@@ -22,6 +22,7 @@ export interface Exhibition {
 export interface SiteContent {
   logoUrl?: string;
   heroLogoUrl?: string;
+  heroImageUrl?: string;
   projects: Project[];
   exhibitions: Exhibition[];
   contactEmail: string;
