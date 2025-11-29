@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Project, ProjectImage } from '../types';
 
@@ -38,12 +38,54 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
   // Combine gallery images. If no gallery images, use thumbnail as single slide.
   const slides: Slide[] = (project.images.length > 0 ? project.images : [project.thumbnail]).map(toSlide);
 
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
+  const isSwiping = useRef(false);
+
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % slides.length);
   };
 
   const prevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  };
+
+  const handleTouchStart = (event: React.TouchEvent) => {
+    const touch = event.touches[0];
+    touchStartX.current = touch.clientX;
+    touchStartY.current = touch.clientY;
+    isSwiping.current = false;
+  };
+
+  const handleTouchMove = (event: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null) return;
+    const touch = event.touches[0];
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    // Only treat as swipe if horizontal intent is clear to avoid hijacking vertical scroll.
+    if (!isSwiping.current && Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 10) {
+      isSwiping.current = true;
+    }
+  };
+
+  const handleTouchEnd = (event: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null || !isSwiping.current) return;
+    const touch = event.changedTouches[0];
+    const deltaX = touch.clientX - touchStartX.current;
+    const deltaY = touch.clientY - touchStartY.current;
+
+    if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 40) {
+      if (deltaX < 0) {
+        nextSlide();
+      } else {
+        prevSlide();
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+    isSwiping.current = false;
   };
 
   return (
@@ -94,7 +136,12 @@ export const ProjectDetail: React.FC<ProjectDetailProps> = ({ project }) => {
       </div>
 
       {/* Right Column: Gallery Slideshow - Fixed Height on Mobile, Full Height on Desktop */}
-      <div className="w-full lg:w-7/12 h-[50vh] lg:h-full bg-[#e5e5e5] relative group flex items-center justify-center overflow-hidden">
+      <div 
+        className="w-full lg:w-7/12 h-[50vh] lg:h-full bg-[#e5e5e5] relative group flex items-center justify-center overflow-hidden"
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
         
         {/* Slides */}
         <div className="w-full h-full p-8 md:p-12 lg:p-16 flex items-center justify-center">
