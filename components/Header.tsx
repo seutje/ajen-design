@@ -93,7 +93,7 @@ export const Header: React.FC<HeaderProps> = ({
 
       {/* Desktop Menu */}
       <nav className="hidden md:flex items-center space-x-8">
-        {['portfolio', 'exhibitions', 'contact'].map((item) => (
+        {['portfolio', 'exhibitions', 'get in touch'].map((item) => (
           <button
             key={item}
             onClick={() => scrollToSection(item)}
@@ -116,7 +116,7 @@ export const Header: React.FC<HeaderProps> = ({
       {isMobileMenuOpen && (
         <div className="absolute top-20 left-0 right-0 bg-[#222222] border-b border-gray-800 p-6 md:hidden shadow-lg animate-in fade-in slide-in-from-top-5">
           <div className="flex flex-col space-y-6">
-             {['portfolio', 'exhibitions', 'contact'].map((item) => (
+             {['portfolio', 'exhibitions', 'get in touch'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
