@@ -17,7 +17,7 @@ export default function App() {
   useEffect(() => {
     const loadContent = async () => {
       try {
-        const response = await fetch('./content.json');
+        const response = await fetch(`${import.meta.env.BASE_URL}content.json`);
         if (!response.ok) {
           throw new Error(`Failed to load content: ${response.statusText}`);
         }
@@ -111,7 +111,7 @@ export default function App() {
       <div className="h-screen w-full flex flex-col items-center justify-center bg-white text-red-500 p-6 text-center">
         <div className="text-xs uppercase tracking-widest font-bold mb-2">Error</div>
         <div className="text-sm">{error || "Content configuration missing"}</div>
-        <p className="text-xs text-gray-400 mt-4">Please ensure content.json is present in the root directory.</p>
+        <p className="text-xs text-gray-400 mt-4">Please ensure public/content.json is present.</p>
       </div>
     );
   }

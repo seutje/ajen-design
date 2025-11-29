@@ -159,7 +159,7 @@ export const AdminControl: React.FC<AdminControlProps> = ({ content, onUpdate })
                         <li>Make changes in the 'Projects' and 'Exhibitions' tabs.</li>
                         <li>Click the Close (X) button to preview changes on the site locally.</li>
                         <li>When satisfied, open Admin again and click "Export Config".</li>
-                        <li>Replace the contents of <code className="bg-gray-200 px-1 rounded text-red-500">content.json</code> in your repository with the downloaded file.</li>
+                        <li>Replace the contents of <code className="bg-gray-200 px-1 rounded text-red-500">public/content.json</code> in your repository with the downloaded file.</li>
                     </ol>
                 </div>
                 
